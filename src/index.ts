@@ -57,36 +57,33 @@ server.on('client:connected', connection => {
           }
         });
         const imagePaths = await pdfImage.convertFile();
-        sendImages(imagePaths);
+        await sendImages(imagePaths);
+
       } else {
         const date = new Date()
-        const filename = `${date.getFullYear()}${zeroPad(date.getMonth(), 2)}${zeroPad(date.getDate(), 2)}-${zeroPad(date.getHours(), 2)}${zeroPad(date.getMinutes(), 2)}${zeroPad(date.getSeconds(), 2)}-`
+        const filename = `${date.getFullYear()}${zeroPad(date.getMonth(), 2)}${zeroPad(date.getDate(), 2)}-${zeroPad(date.getHours(), 2)}${zeroPad(date.getMinutes(), 2)}${zeroPad(date.getSeconds(), 2)}`
         
         const formData = new FormData();
         formData.append('token', `${process.env.SLACK_TOKEN}`);
         formData.append('channels', `${process.env.SLACK_CHANNEL}`);
-        formData.append('filename', `${filename}0${path.extname(filePath)}`);
+        formData.append('filename', `${filename}${path.extname(filePath)}`);
         formData.append('file', fs.readFileSync(filePath), { filename: `${filename}${path.extname(filePath)}` });
 
-        axios.post("https://slack.com/api/files.upload", formData, {
+        await axios.post("https://slack.com/api/files.upload", formData, {
           headers: formData.getHeaders(),
           maxContentLength: Infinity,
           maxBodyLength: Infinity
-        }).then(res => {
-          fs.rm(path.join(__dirname, "../images", filePath), () => {});
-          console.log(res.data)
-        }).catch(err => {
-          fs.rm(path.join(__dirname, "../images", filePath), () => {});
-          console.log(err);
         })
       }
+
+      fs.rm(filePath, () => {});
     }
   });
 });
 
 async function sendImages(images: string[]) {
   const date = new Date()
-  const filename = `${date.getFullYear()}${zeroPad(date.getMonth(), 2)}${zeroPad(date.getDate(), 2)}-${zeroPad(date.getHours(), 2)}${zeroPad(date.getMinutes(), 2)}${zeroPad(date.getSeconds(), 2)}-`
+  const filename = `${date.getFullYear()}${zeroPad(date.getMonth(), 2)}${zeroPad(date.getDate(), 2)}-${zeroPad(date.getHours(), 2)}${zeroPad(date.getMinutes(), 2)}${zeroPad(date.getSeconds(), 2)}`
 
   const zip = new JSZip()
 
@@ -97,20 +94,17 @@ async function sendImages(images: string[]) {
   const formData = new FormData();
   formData.append('token', `${process.env.SLACK_TOKEN}`);
   formData.append('channels', `${process.env.SLACK_CHANNEL}`);
-  formData.append('filename', `${filename}0.zip`);
+  formData.append('filename', `${filename}.zip`);
   formData.append('file', await zip.generateAsync({ type: "nodebuffer" }), { filename: `${filename}.zip` });
 
-  axios.post("https://slack.com/api/files.upload", formData, {
+  await axios.post("https://slack.com/api/files.upload", formData, {
     headers: formData.getHeaders(),
     maxContentLength: Infinity,
     maxBodyLength: Infinity
-  }).then(res => {
-    fs.rm(path.join(__dirname, "../images", `${filename}.zip`), () => {});
-    console.log(res.data)
-  }).catch(err => {
-    fs.rm(path.join(__dirname, "../images", `${filename}.zip`), () => {});
-    console.log(err);
   })
+  for(let i = 0; i < images.length; i++) {
+    fs.rm(images[i], () => {});
+  }
 }
 
 function zeroPad(text: string | number, n: number) {
