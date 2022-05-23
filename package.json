@@ -1,0 +1,43 @@
+{
+  "name": "scan-system",
+  "version": "1.0.0",
+  "description": "Osaka Office Scan System",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm-run-all clean tsc",
+    "clean": "rimraf dist/*",
+    "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
+    "dev": "ts-node .",
+    "dev:watch": "run-p tsc:watch start:watch",
+    "start": "node dist",
+    "start:watch": "nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lit-kansai/scan-system.git"
+  },
+  "author": "mizucoffee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lit-kansai/scan-system/issues"
+  },
+  "homepage": "https://github.com/lit-kansai/scan-system#readme",
+  "devDependencies": {
+    "@types/ftpd": "^0.2.35",
+    "@types/pdf-image": "^2.0.1",
+    "nodemon": "^2.0.16",
+    "npm-run-all": "^4.1.5",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "form-data": "^4.0.0",
+    "ftp-srv": "^4.6.1",
+    "ftpd": "^0.2.16",
+    "jszip": "^3.10.0",
+    "pdf-image": "^2.0.0"
+  }
+}
