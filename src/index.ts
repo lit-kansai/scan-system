@@ -12,6 +12,8 @@ dotenv.config();
 const port = 21;
 const root = path.join(__dirname, '../images');
 
+fs.mkdirSync(root, { recursive: true });
+
 const server = new FtpServer('0.0.0.0', {
   getInitialCwd: () => '/',
   getRoot: () => root,
